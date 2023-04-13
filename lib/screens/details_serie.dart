@@ -21,6 +21,14 @@ class _DetailSerieState extends State<DetailSerie> {
   int episodiosListLenght = 0;
   Series? serie;
 
+  updateList() {
+    _dao.findAllEpisodios(serie!.nome!).then((value) {
+      episodiosList = value;
+      episodiosListLenght = value.length;
+      setState(() {});
+    });
+  }
+
   @override
   void initState() {
     serie = widget.serie;
@@ -28,13 +36,11 @@ class _DetailSerieState extends State<DetailSerie> {
       episodiosList = value;
       episodiosListLenght = value.length;
       print(value);
-      setState(() {
-        
-      });
-    });  
+      setState(() {});
+    });
     super.initState();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -52,14 +58,13 @@ class _DetailSerieState extends State<DetailSerie> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(
-                              top: height * 0.01, bottom: height * 0.03),
+                          padding: EdgeInsets.only(bottom: height * 0.03),
                           child: ClipRRect(
                               borderRadius: const BorderRadius.vertical(
                                   top: Radius.circular(15)),
-                              child: widget.serie.imagemUrl != null
+                              child: serie!.imagemUrl != null
                                   ? Image.network(
-                                      widget.serie.imagemUrl!,
+                                      serie!.imagemUrl!,
                                       width: width,
                                       height: height * 0.25,
                                       fit: BoxFit.cover,
@@ -84,7 +89,7 @@ class _DetailSerieState extends State<DetailSerie> {
                           child: Center(
                             child: SizedBox(
                               width: width * 0.9,
-                              height: height * 0.2,
+                              height: height * 0.15,
                               child: widget.serie.descricao != null &&
                                       widget.serie.descricao!.isNotEmpty
                                   ? Text(widget.serie.descricao!,
@@ -111,13 +116,15 @@ class _DetailSerieState extends State<DetailSerie> {
                   ),
                 ),
                 SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return _EpisodioItem(episodio: episodiosList[index]);
-                    },
-                    childCount: episodiosListLenght,
-                    )
-                  ),
+                    delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return _EpisodioItem(
+                      episodio: episodiosList[index],
+                      serieImagem: serie!.imagemUrl ?? '',
+                    );
+                  },
+                  childCount: episodiosListLenght,
+                )),
               ],
             ),
             Padding(
@@ -150,27 +157,87 @@ class _DetailSerieState extends State<DetailSerie> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) => AddEpisodio(idSerie: serie!.nome!)));
-      },
-      child: const Icon(Icons.add),),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddEpisodio(idSerie: serie!.nome!)))
+              .then((value) {
+            updateList();
+          });
+        },
+        child: const Icon(Icons.add_rounded, weight: 800, size: 50,),
+      ),
     );
   }
 }
 
 class _EpisodioItem extends StatelessWidget {
+  final String serieImagem;
   final Episodios episodio;
-  const _EpisodioItem({super.key, required this.episodio});
+  const _EpisodioItem(
+      {super.key, required this.episodio, required this.serieImagem});
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Card(
+      clipBehavior: Clip.hardEdge,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Container(
-        color: Colors.purple,
+        // color: Colors.purple,
         width: width,
-        height: height*0.15,
+        height: height * 0.15,
+        child: Row(
+          children: [
+            episodio.imagemUrl != null
+                ? Image.network(
+                    episodio.imagemUrl!,
+                    width: width * 0.3,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                  )
+                : SizedBox(
+                    width: width * 0.3,
+                    height: double.infinity,
+                  ),
+            Padding(
+              padding: EdgeInsets.only(left: width * 0.02, top: height * 0.013),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: width * 0.02),
+                    child: Text(
+                      '${episodio.id}. ${episodio.nome!}',
+                      style: const TextStyle(fontSize: 18),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: height * 0.008),
+                    child: SizedBox(
+                      height: height * 0.06,
+                      width: width * 0.65,
+                      child: Text(
+                        episodio.descricao != null ||
+                                episodio.descricao!.isNotEmpty
+                            ? episodio.descricao!
+                            : 'Sem descrição',
+                        style: const TextStyle(fontSize: 16),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 4,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

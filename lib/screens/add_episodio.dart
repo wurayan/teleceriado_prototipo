@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -26,7 +25,9 @@ class AddEpisodio extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(title: const Text('Adicionar Episódio'),),
+      appBar: AppBar(
+        title: const Text('Adicionar Episódio'),
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -39,7 +40,8 @@ class AddEpisodio extends StatelessWidget {
                 onTapOutside: (event) => FocusScope.of(context).unfocus(),
                 keyboardType: TextInputType.number,
                 style: const TextStyle(fontSize: 18),
-                validator: (value) => value==null||value.isEmpty?'Campo obrigatório':null,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Campo obrigatório' : null,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
                 ],
@@ -52,18 +54,20 @@ class AddEpisodio extends StatelessWidget {
                 style: const TextStyle(fontSize: 18),
                 maxLength: 50,
               ),
-              HeaderField(value: 'URL da imagem:',),
+              HeaderField(
+                value: 'URL da imagem:',
+              ),
               TextFormField(
                 controller: _imagemUrlController,
-                onTapOutside: (event)=>FocusScope.of(context).unfocus(),
+                onTapOutside: (event) => FocusScope.of(context).unfocus(),
                 keyboardType: TextInputType.url,
                 style: const TextStyle(fontSize: 18),
               ),
               HeaderField(value: 'AQUI VAI O WIDGET DE AVALIAÇÃO'),
               HeaderField(value: 'Descrição do Episódio:'),
               SizedBox(
-                height: height*0.15,
-                width: width*0.9,
+                height: height * 0.15,
+                width: width * 0.9,
                 child: TextFormField(
                   controller: _descricaoController,
                   keyboardType: TextInputType.text,
@@ -77,28 +81,37 @@ class AddEpisodio extends StatelessWidget {
               ),
               Row(
                 children: [
-                  ElevatedButton(onPressed: (){
-                    FocusScope.of(context).unfocus();
-                    Navigator.pop(context);
-                  }, child: const Text('Voltar')),
-                  ElevatedButton(onPressed: (){
-                    if (_formKey.currentState!.validate()) {
-                      Episodios episodio = Provider.of<Episodios>(context, listen: false);
-                      episodio.id = int.parse(_idController.text);
-                      episodio.idSerie = idSerie;
-                      episodio.imagemUrl = _imagemUrlController.text;
-                      episodio.nome = _nomeController.text;
-                      episodio.descricao = _descricaoController.text;
-                      _dao.saveEpisodio(idSerie, episodio).then((value) {
+                  ElevatedButton(
+                      onPressed: () {
+                        FocusScope.of(context).unfocus();
                         Navigator.pop(context);
-                      });
-                    }
-                  }, child: const Text('Salvar')),
+                      },
+                      child: const Text('Voltar')),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        Episodios episodio =
+                            Provider.of<Episodios>(context, listen: false);
+                        episodio.id = int.parse(_idController.text);
+                        episodio.idSerie = idSerie;
+                        episodio.imagemUrl = _imagemUrlController.text;
+                        episodio.nome = _nomeController.text;
+                        episodio.descricao = _descricaoController.text;
+                        _dao.saveEpisodio(idSerie, episodio).then((value) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Episódio Salvo!')));
+                          Navigator.pop(context, true);
+                        });
+                      }
+                    },
+                    child: const Text('Salvar'),
+                  ),
                 ],
               )
             ],
           ),
-        )),
+        ),
+      ),
     );
   }
 }

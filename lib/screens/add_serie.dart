@@ -6,7 +6,7 @@ import 'package:teleceriado/models/series.dart';
 import 'components/header_field.dart';
 
 class AddSerie extends StatelessWidget {
-   AddSerie({super.key});
+  AddSerie({super.key});
 
   final SeriesDao _dao = SeriesDao();
 
@@ -22,66 +22,85 @@ class AddSerie extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(title: const Text('Adicionar Série'),),
-      body: Form(
-        key: _formKey,
-        child:SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              HeaderField(value: 'Nome da Série:',),
-              TextFormField(
-                controller: _nomeController,
-                onTapOutside: (event)=>FocusScope.of(context).unfocus(),
-                keyboardType: TextInputType.text,
-                style: const TextStyle(fontSize: 18),
-                validator: (value) =>
-                  value==null||value.isEmpty?'Campo obrigatório!':null
-                ,
-              ),
-              HeaderField(value: 'URL da imagem:',),
-              TextFormField(
-                controller: _imagemUrlController,
-                onTapOutside: (event)=>FocusScope.of(context).unfocus(),
-                keyboardType: TextInputType.url,
-                style: const TextStyle(fontSize: 18),
-              ),
-              HeaderField(value: 'AQUI VAI O WIDGET DE AVALIAÇÃO'),
-              SizedBox(
-                height: height*0.2,
-                width: width*0.9,
-                child: TextFormField(
-                  controller: _descricaoController,
-                  keyboardType: TextInputType.text,
-                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                  style: const TextStyle(fontSize: 18),
-                  expands: true,
-                  minLines: null,
-                  maxLines: null,
-                ),
-              ),
-              Row(
+        appBar: AppBar(
+          title: const Text('Adicionar Série'),
+        ),
+        body: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ElevatedButton(onPressed: (){
-                    FocusScope.of(context).unfocus();
-                    Navigator.pop(context);
-                  }, child: const Text('Voltar')),
-                  ElevatedButton(onPressed: (){
-                    if (_formKey.currentState!.validate()) {
-                      Series serie = Provider.of<Series>(context, listen: false);
-                      serie.nome = _nomeController.text;
-                      serie.imagemUrl = _avaliacaoController.text;
-                      serie.imagemUrl = _imagemUrlController.text;
-                      serie.avaliacao = _avaliacaoController.text.isEmpty?0:int.parse(_avaliacaoController.text);
-                      _dao.saveSerie(serie).then((value) => Navigator.pop(context));
-                    }
-                  }, child: const Text('Salvar')),
+                  HeaderField(
+                    value: 'Nome da Série:',
+                  ),
+                  TextFormField(
+                    controller: _nomeController,
+                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                    keyboardType: TextInputType.text,
+                    style: const TextStyle(fontSize: 18),
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Campo obrigatório!'
+                        : null,
+                  ),
+                  HeaderField(
+                    value: 'URL da imagem:',
+                  ),
+                  TextFormField(
+                    controller: _imagemUrlController,
+                    onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                    keyboardType: TextInputType.url,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  HeaderField(value: 'AQUI VAI O WIDGET DE AVALIAÇÃO'),
+                  SizedBox(
+                    height: height * 0.2,
+                    width: width * 0.9,
+                    child: TextFormField(
+                      controller: _descricaoController,
+                      keyboardType: TextInputType.text,
+                      onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                      style: const TextStyle(fontSize: 18),
+                      expands: true,
+                      minLines: null,
+                      maxLines: null,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      ElevatedButton(
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            Navigator.pop(context);
+                          },
+                          child: const Text('Voltar')),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            Series serie =
+                                Provider.of<Series>(context, listen: false);
+                            serie.nome = _nomeController.text;
+                            serie.descricao = _descricaoController.text;
+                            serie.imagemUrl = _imagemUrlController.text;
+                            serie.avaliacao = _avaliacaoController.text.isEmpty
+                                ? 0
+                                : int.parse(_avaliacaoController.text);
+                            _dao.saveSerie(serie).then((value) {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(
+                                content: Text('Série Salva'),
+                                duration: Duration(seconds: 6),
+                              ));
+                              Navigator.pop(context, true);
+                            });
+                          }
+                        },
+                        child: const Text('Salvar'),
+                      ),
+                    ],
+                  )
                 ],
-              )
-            ],
-          ),
-        ))
-    );
+              ),
+            )));
   }
 }
-

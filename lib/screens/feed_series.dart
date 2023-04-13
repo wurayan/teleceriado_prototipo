@@ -39,7 +39,15 @@ class _FeedSeriesState extends State<FeedSeries> {
               return ListView.builder(
                 itemBuilder: (context, index) {
                   final Series serie = seriesList[index];
-                  return _SerieItem(serie: serie);
+                  return Dismissible(
+                    key: ObjectKey(serie),
+                    direction: DismissDirection.endToStart,
+                    onDismissed: (direction) {
+                      _dao.deleteSerie(serie.nome!);
+                      setState(() {});
+                    },
+                    child: _SerieItem(serie: serie),
+                  );
                 },
                 itemCount: seriesList.length,
               );
@@ -52,7 +60,13 @@ class _FeedSeriesState extends State<FeedSeries> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => AddSerie()));
+            context,
+            MaterialPageRoute(builder: (context) => AddSerie()),
+          ).then((value) {
+            if (value == true) {
+              setState(() {});
+            }
+          });
         },
         child: const Icon(Icons.add),
       ),
@@ -73,7 +87,11 @@ class _SerieItem extends StatelessWidget {
       child: InkWell(
         onTap: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => DetailSerie(serie: serie,)));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DetailSerie(
+                        serie: serie,
+                      )));
         },
         child: Card(
           clipBehavior: Clip.hardEdge,
@@ -86,7 +104,7 @@ class _SerieItem extends StatelessWidget {
             decoration: BoxDecoration(
                 color: Color.fromARGB(202, 255, 255, 255),
                 boxShadow: const [
-                   BoxShadow(
+                  BoxShadow(
                       color: Color.fromARGB(255, 0, 0, 0),
                       spreadRadius: 1,
                       blurRadius: 5,
@@ -110,7 +128,7 @@ class _SerieItem extends StatelessWidget {
                 Expanded(
                   child: Padding(
                     padding:
-                      EdgeInsets.only(top: height * 0.01, left: width * 0.03),
+                        EdgeInsets.only(top: height * 0.01, left: width * 0.03),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +136,8 @@ class _SerieItem extends StatelessWidget {
                         Flexible(
                           child: Text(
                             serie.nome!,
-                            style: const TextStyle(fontSize: 20, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 20, color: Colors.black),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
                           ),
@@ -138,7 +157,7 @@ class _SerieItem extends StatelessWidget {
                 ),
                 // const Expanded(child: SizedBox()),
                 Padding(
-                  padding:  EdgeInsets.symmetric(horizontal: width*0.01),
+                  padding: EdgeInsets.symmetric(horizontal: width * 0.01),
                   child: IconButton(
                       onPressed: () {},
                       icon: Icon(
