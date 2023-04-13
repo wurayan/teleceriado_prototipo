@@ -8,7 +8,7 @@ Future<Database> getDatabase() async {
       'CREATE TABLE series (nome VARCHAR(100) NOT NULL PRIMARY KEY, imagemUrl TEXT, descricao TEXT, avaliacao INT(11))'
     );
     db.execute(
-      'CREATE TABLE episodios (id INT NOT NULL PRIMARY KEY, idSerie INT NOT NULL, nome VARCHAR(100), imagemUrl TEXT, descricao TEXT, FOREIGN KEY (idSerie) REFERENCES series (nome))'
+      'CREATE TABLE episodios (id INT NOT NULL, idSerie INT NOT NULL, nome VARCHAR(100), imagemUrl TEXT, descricao TEXT, CONSTRAINT PK_episodio PRIMARY KEY (id, idSerie) FOREIGN KEY (idSerie) REFERENCES series (nome))'
     );
   }, version: 1);
 }

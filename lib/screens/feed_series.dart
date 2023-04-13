@@ -155,17 +155,6 @@ class _SerieItem extends StatelessWidget {
                     ),
                   ),
                 ),
-                // const Expanded(child: SizedBox()),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: width * 0.01),
-                  child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.edit_document,
-                        size: width * 0.1,
-                        color: Colors.black54,
-                      )),
-                )
               ],
             ),
           ),
